@@ -1,0 +1,44 @@
+## Ignore Visual Studio files and folders
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## .NET build output
+bin/
+obj/
+TestResults/
+
+## NuGet packages
+*.nupkg
+*.snupkg
+packages/
+.nuget/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+## Temporary files
+*.tmp
+*.temp
+*.log
+
+## Visual Studio Code settings (optional)
+.vscode/
+
+## Playwright test artifacts
+playwright-report/
+test-results/
+.traces/
+
+## Playwright cache
+pw-*.zip
+.playwright/
+
+## Custom report folder
+Reports/
+
+## OS-specific files
+.DS_Store
+Thumbs.db
