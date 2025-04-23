@@ -1,18 +1,17 @@
 ﻿using AventStack.ExtentReports;
-using Azure;
 using Microsoft.Playwright;
 using PlaywrightWebTemplate.Helpers;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace PlaywrightWebTemplate.Bases
 {
-    public abstract class PageBase
+    public abstract class PageBaseBakup
     {
-        protected IPage Page;
-        protected ExtentTest Test;
+        protected readonly IPage Page;
+        protected readonly ExtentTest Test;
 
 
-        protected PageBase(IPage page, ExtentTest test)
+        protected PageBaseBakup(IPage page, ExtentTest test)
         {
             Page = page;
             Test = test;
@@ -21,14 +20,14 @@ namespace PlaywrightWebTemplate.Bases
         #region Interactions
         protected async Task ClickAsync(ILocator locator)
         {
+            await locator.ClickAsync();
+
             await ExtentReportHelpers.LogStepWithScreenshotAsync(
                 Test,
                 Page,
                 $"🖱️ Clicking on **{locator}**",
                 "Click"
             );
-
-            await locator.ClickAsync();            
         }
 
         protected async Task ClickAsyncWithRetry(ILocator locator, int timeoutInSeconds = 30)
@@ -42,17 +41,17 @@ namespace PlaywrightWebTemplate.Bases
             {
                 try
                 {
-                    await ExtentReportHelpers.LogStepWithScreenshotAsync(
-                       Test,
-                       Page,
-                       $"🖱️ Clicking on **{locator}** with retry",
-                       "ClickWithRetry"
-                   );
-
                     await locator.ClickAsync(new LocatorClickOptions
                     {
                         Timeout = 3000 
-                    });                  
+                    });
+
+                    await ExtentReportHelpers.LogStepWithScreenshotAsync(
+                        Test,
+                        Page,
+                        $"🖱️ Clicking on **{locator}** with retry",
+                        "ClickWithRetry"
+                    );
 
                     return;
                 }
@@ -82,8 +81,8 @@ namespace PlaywrightWebTemplate.Bases
             await ExtentReportHelpers.LogStepWithScreenshotAsync(
                 Test,
                 Page,
-                $"📝 Typing **{text}** into **{locator}**",
-                "Fill"
+                $"📝 Typing in **{text}** into **{locator}**",
+                "SendKeys"
             );
         }
 
@@ -93,13 +92,13 @@ namespace PlaywrightWebTemplate.Bases
             await ExtentReportHelpers.LogStepWithScreenshotAsync(
                 Test,
                 Page,
-                $"🔍 Getting text from **{locator}**: `{text}`",
-                "InnerText"
+                $"🔍 Get text from **{locator}**: `{text}`",
+                "GetText"
             );
             return text;
         }
 
-        protected async Task<bool> GetIfElementExists(ILocator locator)
+        protected async Task<bool> ElementExistsAsync(ILocator locator)
         {
             try
             {
@@ -114,12 +113,12 @@ namespace PlaywrightWebTemplate.Bases
                     State = WaitForSelectorState.Attached,
                     Timeout = timeout
                 });
-                
+
                 await ExtentReportHelpers.LogStepWithScreenshotAsync(
                 Test,
                 Page,
                 $"🔍 Verifying if element exists **{locator}**",
-                "VerifyIfElementExist"
+                "ElementExists"
             );
                 return true;
             }
@@ -134,12 +133,10 @@ namespace PlaywrightWebTemplate.Bases
             var newPage = await Page.Context.NewPageAsync();
             await newPage.BringToFrontAsync();
 
-            Page = newPage;
-
             await ExtentReportHelpers.LogStepWithScreenshotAsync(
                 Test,
-                Page,
-                $"🆕 Opening a new tab",
+                newPage,
+                $"🆕 Opened a new tab",
                 "OpenNewTab"
             );
         }
@@ -149,12 +146,10 @@ namespace PlaywrightWebTemplate.Bases
             var firstPage = Page.Context.Pages.First();
             await firstPage.BringToFrontAsync();
 
-            Page = firstPage;
-
             await ExtentReportHelpers.LogStepWithScreenshotAsync(
                 Test,
-                Page,
-                $"📑 Switching to first tab",
+                firstPage,
+                $"📑 Switched to first tab",
                 "SwitchToFirstTab"
             );
         }
@@ -164,12 +159,10 @@ namespace PlaywrightWebTemplate.Bases
             var lastPage = Page.Context.Pages.Last();
             await lastPage.BringToFrontAsync();
 
-            Page = lastPage;
-
             await ExtentReportHelpers.LogStepWithScreenshotAsync(
                 Test,
                 lastPage,
-                $"📑 Switching to last tab",
+                $"📑 PARAMETER: Switched to last tab",
                 "SwitchToLastTab"
             );
         }

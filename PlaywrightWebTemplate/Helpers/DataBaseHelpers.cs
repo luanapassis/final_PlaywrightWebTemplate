@@ -4,7 +4,7 @@ namespace PlaywrightWebTemplate.Helpers
 {
     public class DataBaseHelpers
     {
-        private SqlConnection GetDBConnection()
+        private static SqlConnection GetDBConnection()
         {
             var builder = new SqlConnectionStringBuilder
             {
@@ -18,7 +18,7 @@ namespace PlaywrightWebTemplate.Helpers
             return new SqlConnection(builder.ConnectionString);
         }
 
-        public void ExecuteQuery(string query)
+        public static void ExecuteQuery(string query)
         {
             using (var connection = GetDBConnection())
             using (var cmd = new SqlCommand(query, connection))
@@ -29,7 +29,7 @@ namespace PlaywrightWebTemplate.Helpers
             }
         }
 
-        public List<string> GetDataQuery(string query, string[,] parametersArray = null)
+        public static List<string> GetDataQuery(string query, string[,] parametersArray = null)
         {
             var resultList = new List<string>();
 
@@ -62,7 +62,7 @@ namespace PlaywrightWebTemplate.Helpers
             return resultList.Count > 0 ? resultList : null;
         }
 
-        public List<string> GetListOfDataQuery(string query)
+        public static List<string> GetListDataQuery(string query)
         {
             var resultList = new List<string>();
 

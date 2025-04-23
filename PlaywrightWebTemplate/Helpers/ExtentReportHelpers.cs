@@ -27,7 +27,7 @@ namespace PlaywrightWebTemplate.Helpers
         {
             if (_extent == null)
             {
-                var baseDir = Path.Combine(GeneralHelpers.GetCurrentSolutionFolderPath(), "Reports");
+                var baseDir = Path.Combine(GeneralHelpers.GetProjectPath(), "Reports");
                 _reportFolderPath = Path.Combine(baseDir, _reportName);
                 Directory.CreateDirectory(_reportFolderPath); 
 
@@ -96,11 +96,11 @@ namespace PlaywrightWebTemplate.Helpers
             }
         }
 
-        public static async Task LogStepWithScreenshotAsync(ExtentTest test, IPage page, string mensagem, string nomeArquivoBase)
+        public static async Task LogStepWithScreenshotAsync(ExtentTest test, IPage page, string message, string fileNameBase)
         {
             if (JsonHelpers.GetParameterAppSettings("SCREENSHOT_EVERY_STEP") == "false")
             {
-                test.Info(mensagem);
+                test.Info(message);
                 return;
             }
 
@@ -109,18 +109,18 @@ namespace PlaywrightWebTemplate.Helpers
 
             var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmssfff");
             Guid guid = Guid.NewGuid();
-            var nomeArquivo = $"{nomeArquivoBase}_{DateTime.Now:yyyyMMdd_HHmmssfff}_{guid}.png";
-            var caminhoCompleto = Path.Combine(screenshotDir, nomeArquivo);
-            var caminhoRelativo = Path.Combine("ScreenShot", nomeArquivo);
+            var fileName = $"{fileNameBase}_{DateTime.Now:yyyyMMdd_HHmmssfff}_{guid}.png";
+            var fullPath = Path.Combine(screenshotDir, fileName);
+            var relativePath = Path.Combine("ScreenShot", fileName);
 
             await page.ScreenshotAsync(new PageScreenshotOptions
             {
-                Path = caminhoCompleto,
+                Path = fullPath,
                 FullPage = true
             });
 
-            var media = MediaEntityBuilder.CreateScreenCaptureFromPath(caminhoRelativo).Build();
-            test.Info(mensagem, media);
+            var media = MediaEntityBuilder.CreateScreenCaptureFromPath(relativePath).Build();
+            test.Info(message, media);
         }
 
 

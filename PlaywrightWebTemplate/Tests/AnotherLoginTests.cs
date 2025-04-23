@@ -7,15 +7,15 @@ using System.Text.RegularExpressions;
 
 namespace PlaywrightWebTemplate.Tests
 {
-    [Parallelizable(ParallelScope.Self)]
+    //[Parallelizable(ParallelScope.Self)]
     [TestFixture]
-    public class LoginTests2 : TestBase
+    public class AnotherLoginTests : TestBase
     {
         [Test]
         public async Task TestingSomethingWillPass()
         {
             //arrange
-            string user = "certo 1";
+            string user = "tst 1";
             string password = "SuperSecretPassword!";
             var loginPage = new LoginPage(Page, _test); // _test é definido no Setup()
 
@@ -33,7 +33,7 @@ namespace PlaywrightWebTemplate.Tests
         public async Task TestingSomethingWillNotPass()
         {
             //arrange
-            string user = "errado 2";
+            string user = "wrong 2";
             string password = "WrongPass";
             var loginPage = new LoginPage(Page, _test); // _test é definido no Setup()
 

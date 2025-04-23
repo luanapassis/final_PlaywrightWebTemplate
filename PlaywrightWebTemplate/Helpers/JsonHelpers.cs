@@ -14,7 +14,7 @@ namespace PlaywrightWebTemplate.Helpers
         {
             try
             {
-                json = JObject.Parse(File.ReadAllText(GeneralHelpers.GetCurrentSolutionFolderPath() + filename));
+                json = JObject.Parse(File.ReadAllText(GeneralHelpers.GetProjectPath() + filename));
 
                 return json;
             }

@@ -27,7 +27,7 @@ namespace PlaywrightWebTemplate.Helpers
             return new BrowserTypeLaunchOptions
             {
                 Headless = bool.TryParse(JsonHelpers.GetParameterAppSettings("HEADLESS"), out var headless) ? headless : (bool?)null, // Convert string to nullable bool
-                SlowMo = 0, // Useful for visual debugging
+                SlowMo = float.TryParse(JsonHelpers.GetParameterAppSettings("SLOW_MOTION"), out var slowMo) ? slowMo : (float?)null, // Convert string to nullable float
                 
             };
         }

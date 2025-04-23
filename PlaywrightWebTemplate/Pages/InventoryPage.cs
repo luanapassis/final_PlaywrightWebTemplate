@@ -9,12 +9,13 @@ using PlaywrightWebTemplate.Bases;
 
 namespace PlaywrightWebTemplate.Pages
 {
-    internal class InventoryPage : Bases.PageBase
+    internal class InventoryPage(IPage page, ExtentTest test) : PageBase(page, test)
     {
+
+        //locators
         private ILocator productField => Page.Locator("[class='title']");
 
-        public InventoryPage(IPage page, ExtentTest test) : base(page, test) { }
-
+        //actions
         public async Task<string> GetProductsText()
         {
             return await GetTextAsync(productField);

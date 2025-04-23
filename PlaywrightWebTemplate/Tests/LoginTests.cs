@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace PlaywrightWebTemplate.Tests
 {
-    [Parallelizable(ParallelScope.Self)]
+    //[Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class LoginTests : TestBase
     {
@@ -35,7 +35,7 @@ namespace PlaywrightWebTemplate.Tests
         public async Task DoLoginWithWrongCredentials()
         {
             //arrange
-            string user = "errado 1";
+            string user = "wrong 1";
             string password = "WrongPass";
             var loginPage = new LoginPage(Page, _test); // _test é definido no Setup()
 
