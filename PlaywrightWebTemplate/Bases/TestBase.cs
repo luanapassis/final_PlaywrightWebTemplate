@@ -37,7 +37,7 @@ namespace PlaywrightWebTemplate.Bases
             var status = TestContext.CurrentContext.Result.Outcome.Status;
             var message = TestContext.CurrentContext.Result.Message;
 
-            await ExtentReportHelpers.AttachExecutionVideoAsync(ExtentTest, Page);
+            await ExtentReportHelpers.AttachAllExecutionVideosAsync(ExtentTest, Context);
             await ExtentReportHelpers.AddTestResult(ExtentTest, status, message, Page);
 
             await Context.CloseAsync();

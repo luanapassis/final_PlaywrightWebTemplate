@@ -125,6 +125,8 @@ namespace PlaywrightWebTemplate.Bases
 
         protected async Task SwitchToLastTabAsync()
         {
+            await Page.WaitForTimeoutAsync(3000); //3 sec
+
             await Page.WaitForLoadStateAsync(LoadState.DOMContentLoaded);
 
             var lastPage = Page.Context.Pages.Last();            
@@ -141,6 +143,41 @@ namespace PlaywrightWebTemplate.Bases
                 "SwitchToLastTab"
             );
         }
+
+        protected async Task CloseCurrentTabAsync()
+        {
+            await ExtentReportHelpers.SaveVideoAndReturnRelativePath(Page, Test, "📽️ Video captured before closing tab");
+
+            await ExtentReportHelpers.LogStepWithScreenshotAsync(
+                Test,
+                Page,
+                $"❌ Closing current tab",
+                "CloseTab"
+            );
+
+            await Page.CloseAsync();
+
+            if (Page.Context.Pages.Count > 0)
+            {
+                var newActivePage = Page.Context.Pages.First();
+                await newActivePage.BringToFrontAsync();
+                Page = newActivePage;
+
+                await ExtentReportHelpers.LogStepWithScreenshotAsync(
+                    Test,
+                    Page,
+                    $"📑 Switched focus to first available tab after closing",
+                    "SwitchTabAfterClose"
+                );
+            }
+        }
+
+        protected string GetCurrentUrl()
+        {
+            return Page.Url;
+        }
+
+
         #endregion
     }
 }

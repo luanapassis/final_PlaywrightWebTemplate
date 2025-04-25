@@ -147,6 +147,66 @@ namespace PlaywrightWebTemplate.Helpers
             test.Info(message, media);
         }
 
+        public static async Task AttachAllExecutionVideosAsync(ExtentTest test, IBrowserContext context)
+        {
+            if (JsonHelpers.GetParameterAppSettings("RECORD_VIDEO")?.ToLower() != "true")
+                return;
+
+            var reportFolder = GetReportFolder();
+            var videoTargetFolder = Path.Combine(reportFolder, "Videos");
+            Directory.CreateDirectory(videoTargetFolder);
+
+            int tabIndex = 1;
+            foreach (var page in context.Pages)
+            {
+                await SaveVideoAndReturnRelativePath(page, test, $"📽️ Click to watch video of tab #{tabIndex}");
+                tabIndex++;
+            }
+        }
+
+
+        public static async Task<string> SaveVideoAndReturnRelativePath(IPage page, ExtentTest extentTest, string customMessage = null)
+        {
+            if (page?.Video == null)
+                return null;
+
+            try
+            {
+                var videoPath = await page.Video.PathAsync();
+                var videoFileName = Path.GetFileName(videoPath);
+
+                var reportFolder = GetReportFolder();
+                var videoTargetFolder = Path.Combine(reportFolder, "Videos");
+                Directory.CreateDirectory(videoTargetFolder);
+
+                var fullVideoPath = Path.Combine(videoTargetFolder, videoFileName);
+                var relativeVideoPath = Path.Combine("Videos", videoFileName);
+
+                if (!File.Exists(fullVideoPath))
+                {
+                    File.Copy(videoPath, fullVideoPath, overwrite: true);
+                }
+
+                if (!string.IsNullOrEmpty(customMessage))
+                {
+                    extentTest?.Info($"📽️ <a href='{relativeVideoPath}' target='_blank'>{customMessage}</a>");
+                }
+                else
+                {
+                    extentTest?.Info($"📽️ <a href='{relativeVideoPath}' target='_blank'>Click to watch video</a>");
+                }
+
+                return relativeVideoPath;
+            }
+            catch (Exception ex)
+            {
+                extentTest?.Warning($"⚠️ Unable to save video: {ex.Message}");
+                return null;
+            }
+        }
+
+
+
         public static string GetReportFolder()
         {
             return _reportFolderPath;
