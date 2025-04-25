@@ -1,134 +1,138 @@
-# 🧪 Playwright Web Test Automation Framework (.NET + NUnit)
+# PlaywrightWebTemplate
 
-## 📁 Project Structure Overview
+## 🧪 Overview
 
-This framework is built using:
+**PlaywrightWebTemplate** is a robust and modular test automation framework built using:
 
-- **Microsoft.Playwright** for browser automation.
-- **NUnit** for organizing and executing tests.
-- **ExtentReports** for visual reporting.
-- A modular **Page Object Model (POM)** structure for maintainability and reusability.
+- ✅ [Playwright](https://playwright.dev/dotnet)
+- ✅ [NUnit](https://nunit.org/)
+- ✅ [ExtentReports](https://extentreports.com/)
+- ✅ C# (.NET)
+- ✅ SQL Server Integration
+- ✅ Configuration-driven architecture
 
-### Key Folders and Files:
+It supports **parallel execution**, **video recording**, **step-by-step screenshots**, **test data from SQL**, and **multi-environment configuration**.
 
-| Path                         | Description                                                         |
-|------------------------------|----------------------------------------------------------------------|
-| `Bases/TestBase.cs`          | Abstract class that initializes the browser, context, and page.     |
-| `Bases/PageBase.cs`          | Core base for all pages, includes reusable interactions.             |
-| `Helpers/JsonHelpers.cs`     | Reads configuration from `appsettingsQA.json`.                       |
-| `Helpers/ExtentReportHelpers.cs` | Handles integration with ExtentReports.                           |
-| `Helpers/BrowserHelpers.cs`  | Decides which browser to launch based on configuration.             |
-| `Helpers/PlaywrightSessionHelpers.cs` | Creates contexts and pages with configuration support.       |
-| `Pages`         | Page object, inherits from `PageBase`.                      |
-| `Tests`        | NUnit test file, inherits from `TestBase`.                          |
+---
 
-## 🧱 C# Development Standards
+## 📂 Project Structure
 
-This project adheres to **common .NET/C# best practices**:
+```
+PlaywrightWebTemplate/
+│
+├── Bases/              # Test and Page base classes
+├── DataBaseSteps/      # Classes for SQL-based test data retrieval
+├── Helpers/            # Utilities (browser setup, reporting, config, etc.)
+├── Pages/              # Page Object Models
+├── Queries/            # SQL files for test data
+├── Reports/            # Generated HTML test reports (ExtentReports)
+├── Steps/              # Reusable test steps (e.g. login flow)
+├── Tests/              # Test classes organized by feature or domain
+│
+├── appsettingsQA.json       # Environment-specific config
+├── environment.json         # Current environment selector
+└── PlaywrightWebTemplate.csproj
+```
 
-| Principle                          | Implementation Example                             |
-|-----------------------------------|----------------------------------------------------|
-| ✔️ Async/Await everywhere         | All Playwright methods are async (`Task<>`)        |
-| ✔️ Dependency inversion (DI ready)| Pages and helpers are injected with `IPage`, `ExtentTest` |
-| ✔️ SOLID Principles               | Each class has a clear single responsibility       |
-| ✔️ Readable Naming Conventions    | CamelCase for methods, PascalCase for types        |
-| ✔️ Logging & Reporting            | Built-in screenshot capture and Extent logging     |
+---
 
-## 🔧 Configuration
+## ⚙️ Configuration
 
-### 📄 appsettingsQA.json
+Configurations are stored in external JSON files:
+
+- **environment.json**: defines the current environment (`QA`, `UAT`, `DEV`)
+- **appsettings{ENV}.json**: stores environment-specific settings
+
+Example: `appsettingsQA.json`
 
 ```json
 {
+  "URL": "https://www.saucedemo.com/",
   "BROWSER": "chromium",
-  "URL": "https://your-app-url.com",
-  "DEFAULT_TIMEOUT": "10000"
+  "HEADLESS": "false",
+  "RECORD_VIDEO": "true",
+  "SCREENSHOT_EVERY_STEP": "true",
+  "DEFAULT_TIMEOUT": 100000,
+  ...
 }
 ```
 
-### Supported Browsers
+---
 
-- `chromium`
-- `firefox`
-- `webkit`
+## 🧰 Features
 
-## 🚀 How to Run Tests
+- 🌐 **Cross-browser** support (Chromium, Firefox, WebKit)
+- 🎥 **Video recording** and 📸 **screenshots** at every step
+- 📊 **HTML reporting** with [ExtentReports](https://extentreports.com/)
+- 🧬 **Reusable Step classes** for modularity
+- 🔧 **Configurable timeouts, headless mode, locale, and base URL**
+- 🧮 **SQL Server integration** to fetch test data via `.sql` files
 
-Install dependencies:
+---
+
+## ▶️ How to Run
+
+### 1. Install Dependencies
 
 ```bash
 dotnet restore
-playwright install
 ```
 
-Run tests:
+### 2. Run All Tests
 
 ```bash
 dotnet test
 ```
 
-Optionally specify browser:
+### 3. Run a Specific Test File
 
 ```bash
-dotnet test -- Playwright.BrowserName=chromium
-
-dotnet test -- NUnit.NumberOfTestWorkers=1
+dotnet test --filter "FullyQualifiedName~PlaywrightWebTemplate.Tests.LoginTests"
 ```
 
-## 🧩 Writing Page Objects
+---
 
-Each page class inherits from `PageBase.cs`, which includes common methods like:
+## 📁 Reports
 
-```csharp
-await ClickAsync(locator);
-await SendKeysAsync(locator, "value");
-await GetTextAsync(locator);
-await ElementExistsAsync(locator);
-etc..
-```
+- HTML reports are generated automatically under the `/Reports` directory.
+- Screenshots and videos are attached to each step (if enabled in config).
 
-Example:
+---
 
-```csharp
-public class LoginPage : PageBase
-{
-    private readonly ILocator usernameInput;
-    private readonly ILocator passwordInput;
-    private readonly ILocator loginButton;
+## 🧪 Test Execution Strategy
 
-    public LoginPage(IPage page, ExtentTest test) : base(page, test)
-    {
-        usernameInput = page.Locator("#username");
-        passwordInput = page.Locator("#password");
-        loginButton   = page.Locator("#login");
-    }
+- Each test inherits from `TestBase`, which sets up:
+  - A new browser and context per test
+  - ExtentReports integration
+  - Full cleanup of context and browser at the end
+- Pages inherit from `PageBase`, which wraps:
+  - Playwright actions with logging
+  - Tab/window switching
+  - Step-level screenshot capture
 
-    public async Task LoginAsync(string user, string pass)
-    {
-        await SendKeysAsync(usernameInput, user);
-        await SendKeysAsync(passwordInput, pass);
-        await ClickAsync(loginButton);
-    }
-}
-```
+---
 
-## 🧪 Creating Tests
+## ✅ Best Practices
 
-Tests extend `TestBase.cs`, which handles setup, teardown, and navigation.
+- Define all test data outside the code (SQL, JSON, config).
+- Reuse Steps to avoid duplication across tests.
+- Use environment-based configuration to support multiple stages (QA/UAT/DEV).
+- Use `[Parallelizable]` to run tests faster.
 
-```csharp
-[Test]
-public async Task LoginShouldWork()
-{
-    var loginPage = new LoginPage(Page, _test);
-    await loginPage.LoginAsync("admin", "adminpass");
+---
 
-    Assert.True(await Page.IsVisibleAsync("text=Dashboard"));
-}
-```
+## 🧩 Extensions & Next Steps
 
-## 📊 Reports
+This framework is built for scalability. It is easy to extend with:
 
-- HTML reports are generated using ExtentReports.
-- Each action logs a screenshot and a readable message.
-- Report is flushed after all tests complete.
+- CI/CD integration (GitHub Actions, Azure DevOps, Jenkins)
+- Data-driven testing (`TestCaseSource`)
+- API testing layer
+- Retry policies
+- Custom CLI to generate Pages/Steps/Tests
+
+---
+
+## ✍️ Authors
+
+Created and maintained by the QA team at [Update Here].
