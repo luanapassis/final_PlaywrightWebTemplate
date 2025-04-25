@@ -1,14 +1,12 @@
-using Microsoft.Playwright;
-using Microsoft.Playwright.NUnit;
 using NUnit.Framework;
 using PlaywrightWebTemplate.Bases;
 using PlaywrightWebTemplate.Pages;
-using System.Text.RegularExpressions;
 
 namespace PlaywrightWebTemplate.Tests
 {
-    //[Parallelizable(ParallelScope.Self)]
+    
     [TestFixture]
+    [Parallelizable(ParallelScope.Self)]
     public class AnotherLoginTests : TestBase
     {
         [Test]
@@ -17,7 +15,7 @@ namespace PlaywrightWebTemplate.Tests
             //arrange
             string user = "tst 1";
             string password = "SuperSecretPassword!";
-            var loginPage = new LoginPage(Page, _test); // _test é definido no Setup()
+            var loginPage = new LoginPage(Page, ExtentTest); 
 
             //actions
             //await loginPage.GotoAsync();
@@ -35,7 +33,7 @@ namespace PlaywrightWebTemplate.Tests
             //arrange
             string user = "wrong 2";
             string password = "WrongPass";
-            var loginPage = new LoginPage(Page, _test); // _test é definido no Setup()
+            var loginPage = new LoginPage(Page, ExtentTest);
 
             //actions
             await loginPage.TypeUserName(user);

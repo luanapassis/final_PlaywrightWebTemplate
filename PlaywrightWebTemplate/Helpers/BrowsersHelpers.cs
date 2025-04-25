@@ -5,8 +5,6 @@ using System.Threading.Tasks;
 
 namespace PlaywrightWebTemplate.Helpers
 {
-
-
     public static class BrowserHelpers
     {
         public static async Task<IBrowser> CreateBrowserAsync(IPlaywright playwright)
@@ -28,7 +26,6 @@ namespace PlaywrightWebTemplate.Helpers
             {
                 Headless = bool.TryParse(JsonHelpers.GetParameterAppSettings("HEADLESS"), out var headless) ? headless : (bool?)null, // Convert string to nullable bool
                 SlowMo = float.TryParse(JsonHelpers.GetParameterAppSettings("SLOW_MOTION"), out var slowMo) ? slowMo : (float?)null, // Convert string to nullable float
-                
             };
         }
     }

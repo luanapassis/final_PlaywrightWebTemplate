@@ -31,7 +31,7 @@ namespace PlaywrightWebTemplate.Pages
 
         public async Task ClickEnter()
         {
-            await ClickAsyncWithRetry(loginButton);
+            await ClickAsync(loginButton);
         }
 
         public async Task<bool> GetErrorMessage()

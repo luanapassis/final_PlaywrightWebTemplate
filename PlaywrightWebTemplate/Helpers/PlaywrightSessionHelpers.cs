@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 using Microsoft.Playwright;
 
 namespace PlaywrightWebTemplate.Helpers
@@ -11,12 +7,22 @@ namespace PlaywrightWebTemplate.Helpers
     {
         public static async Task<IBrowserContext> CreateContextAsync(IBrowser browser)
         {
-            return await browser.NewContextAsync(new BrowserNewContextOptions
+            bool.TryParse(JsonHelpers.GetParameterAppSettings("RECORD_VIDEO"), out var shouldRecordVideo);
+
+            var contextOptions = new BrowserNewContextOptions
             {
                 ViewportSize = new ViewportSize { Width = 1280, Height = 720 },
                 Locale = JsonHelpers.GetParameterAppSettings("BROWSER_LOCALE"),
-                BaseURL = JsonHelpers.GetParameterAppSettings("URL")
-            });
+                BaseURL = JsonHelpers.GetParameterAppSettings("URL"),
+            };
+
+            if (shouldRecordVideo)
+            {
+                contextOptions.RecordVideoDir = Path.Combine(ExtentReportHelpers.GetReportFolder(), "Videos");
+                contextOptions.RecordVideoSize = new RecordVideoSize { Width = 1280, Height = 720 };
+            }
+
+            return await browser.NewContextAsync(contextOptions);
         }
 
         public static async Task<IPage> CreatePageAsync(IBrowserContext context)
@@ -36,6 +42,8 @@ namespace PlaywrightWebTemplate.Helpers
         public static async Task NavigateToInitialPageAsync(IPage page)
         {
             await page.GotoAsync("");
+            await page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+
         }
     }
 }

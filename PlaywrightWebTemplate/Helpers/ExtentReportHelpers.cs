@@ -53,21 +53,16 @@ namespace PlaywrightWebTemplate.Helpers
             _currentTest.Value = test;
         }
 
-        public static ExtentTest GetCurrentTest()
-        {
-            return _currentTest.Value;
-        }
-
-        public static async Task RegistrarResultadoAsync(ExtentTest test, TestStatus status, string message, IPage page)
+        public static async Task AddTestResult(ExtentTest test, TestStatus status, string message, IPage page)
         {
             switch (status)
             {
                 case TestStatus.Passed:
-                    test.Pass("✅ Test Pass.");
+                    test.Pass("✅ ExtentTest Pass.");
                     break;
 
                 case TestStatus.Failed:
-                    test.Fail($"❌ Test Fail: {message}");
+                    test.Fail($"❌ ExtentTest Fail: {message}");
 
                     var screenshotDir = Path.Combine(_reportFolderPath, "ScreenShot");
                     Directory.CreateDirectory(screenshotDir);
@@ -87,12 +82,41 @@ namespace PlaywrightWebTemplate.Helpers
                     break;
 
                 case TestStatus.Skipped:
-                    test.Skip("⚠️ Test skiped.");
+                    test.Skip("⚠️ ExtentTest skiped.");
                     break;
 
                 default:
                     test.Warning("Unknow.");
                     break;
+            }
+        }
+
+        public static async Task AttachExecutionVideoAsync(ExtentTest test, IPage page)
+        {
+            if (JsonHelpers.GetParameterAppSettings("RECORD_VIDEO")?.ToLower() != "true")
+                return;
+
+            if (page?.Video == null)
+                return;
+
+            try
+            {
+                var videoPath = await page.Video.PathAsync();
+                var videoFileName = Path.GetFileName(videoPath);
+                var reportFolder = GetReportFolder();
+                var videoTargetFolder = Path.Combine(reportFolder, "Videos");
+                var fullVideoPath = Path.Combine(videoTargetFolder, videoFileName);
+                var relativeVideoPath = Path.Combine("Videos", videoFileName);
+
+                if (!File.Exists(fullVideoPath))
+                {
+                    File.Copy(videoPath, fullVideoPath, overwrite: true);
+                }
+                test.Info($"📽️ <a href='{relativeVideoPath}' target='_blank'>Click to watch execution video</a>");
+            }
+            catch (Exception ex)
+            {
+                test.Warning($"⚠️ Unable to attach video: {ex.Message}");
             }
         }
 
@@ -123,7 +147,10 @@ namespace PlaywrightWebTemplate.Helpers
             test.Info(message, media);
         }
 
-
+        public static string GetReportFolder()
+        {
+            return _reportFolderPath;
+        }
 
         public static void Flush()
         {

@@ -20,13 +20,11 @@ namespace PlaywrightWebTemplate.Helpers
 
         public static string ReadValueInFile(string file)
         {
-            //used to read value in sql file
             string text = File.ReadAllText(file);
             return text;
         }
         public static string ReplaceValuesInFile(string text, string currentValue, string newValue)
         {
-            //used to replace values in sql files
             text = text.Replace(currentValue, newValue);
             return text;
         }

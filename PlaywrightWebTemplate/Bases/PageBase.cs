@@ -2,7 +2,6 @@
 using Azure;
 using Microsoft.Playwright;
 using PlaywrightWebTemplate.Helpers;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace PlaywrightWebTemplate.Bases
 {
@@ -10,7 +9,6 @@ namespace PlaywrightWebTemplate.Bases
     {
         protected IPage Page;
         protected ExtentTest Test;
-
 
         protected PageBase(IPage page, ExtentTest test)
         {
@@ -28,52 +26,15 @@ namespace PlaywrightWebTemplate.Bases
                 "Click"
             );
 
-            await locator.ClickAsync();            
+            await locator.ClickAsync();
+
+            await ExtentReportHelpers.LogStepWithScreenshotAsync(
+                Test,
+                Page,
+                $"🖱️ After Clicking on **{locator}**",
+                "AfterClick"
+            );
         }
-
-        protected async Task ClickAsyncWithRetry(ILocator locator, int timeoutInSeconds = 30)
-        {
-            var timeout = TimeSpan.FromSeconds(timeoutInSeconds);
-            var start = DateTime.Now;
-
-            Exception? lastException = null;
-
-            while ((DateTime.Now - start) < timeout)
-            {
-                try
-                {
-                    await ExtentReportHelpers.LogStepWithScreenshotAsync(
-                       Test,
-                       Page,
-                       $"🖱️ Clicking on **{locator}** with retry",
-                       "ClickWithRetry"
-                   );
-
-                    await locator.ClickAsync(new LocatorClickOptions
-                    {
-                        Timeout = 3000 
-                    });                  
-
-                    return;
-                }
-                catch (PlaywrightException ex)
-                {
-                    lastException = ex;
-
-                    if (!ex.Message.Contains("Another element would receive the click") &&
-                        !ex.Message.Contains("Element is not attached") &&
-                        !ex.Message.Contains("not visible"))
-                    {
-                        throw;
-                    }
-
-                    await Task.Delay(500);
-                }
-            }
-
-            throw new TimeoutException($"❌ Unable to click on element: {locator} within {timeoutInSeconds}s. Last error: {lastException?.Message}");
-        }
-
 
         protected async Task SendKeysAsync(ILocator locator, string text)
         {
@@ -132,13 +93,15 @@ namespace PlaywrightWebTemplate.Bases
         protected async Task OpenNewTabAsync()
         {
             var newPage = await Page.Context.NewPageAsync();
+            await newPage.WaitForLoadStateAsync(LoadState.NetworkIdle);
+
             await newPage.BringToFrontAsync();
 
             Page = newPage;
 
             await ExtentReportHelpers.LogStepWithScreenshotAsync(
                 Test,
-                Page,
+                newPage,
                 $"🆕 Opening a new tab",
                 "OpenNewTab"
             );
@@ -147,13 +110,14 @@ namespace PlaywrightWebTemplate.Bases
         protected async Task SwitchToFirstTabAsync()
         {
             var firstPage = Page.Context.Pages.First();
+
             await firstPage.BringToFrontAsync();
 
             Page = firstPage;
 
             await ExtentReportHelpers.LogStepWithScreenshotAsync(
                 Test,
-                Page,
+                firstPage,
                 $"📑 Switching to first tab",
                 "SwitchToFirstTab"
             );
@@ -161,7 +125,11 @@ namespace PlaywrightWebTemplate.Bases
 
         protected async Task SwitchToLastTabAsync()
         {
-            var lastPage = Page.Context.Pages.Last();
+            await Page.WaitForLoadStateAsync(LoadState.DOMContentLoaded);
+
+            var lastPage = Page.Context.Pages.Last();            
+
+            await lastPage.WaitForLoadStateAsync(LoadState.DOMContentLoaded);
             await lastPage.BringToFrontAsync();
 
             Page = lastPage;

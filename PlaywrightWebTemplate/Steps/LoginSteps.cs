@@ -1,22 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AventStack.ExtentReports;
-using Azure;
+﻿using AventStack.ExtentReports;
 using Microsoft.Playwright;
-using NUnit.Framework;
-using PlaywrightWebTemplate.Bases;
 using PlaywrightWebTemplate.Pages;
 
 namespace PlaywrightWebTemplate.Steps
 {
-    internal class LoginSteps : TestBase
+    internal class LoginSteps(IPage page, ExtentTest test) 
     {
         public async Task DoLogin(string user, string password)
         {
-            var loginPage = new LoginPage(Page, _test);
+            var loginPage = new LoginPage(page, test);
 
             // Actions
             await loginPage.TypeUserName(user);

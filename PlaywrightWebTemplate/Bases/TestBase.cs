@@ -12,7 +12,7 @@ namespace PlaywrightWebTemplate.Bases
         protected IBrowser Browser;
         protected IBrowserContext Context;
         protected IPage Page;
-        protected ExtentTest _test;
+        protected ExtentTest ExtentTest;
 
         [OneTimeSetUp]
         public async Task OneTimeSetupAsync()
@@ -24,8 +24,8 @@ namespace PlaywrightWebTemplate.Bases
         [SetUp]
         public async Task SetupAsync()
         {
-            _test = ExtentReportHelpers.GetExtent().CreateTest(TestContext.CurrentContext.Test.Name);
-            ExtentReportHelpers.SetCurrentTest(_test);
+            ExtentTest = ExtentReportHelpers.GetExtent().CreateTest(TestContext.CurrentContext.Test.Name);
+            ExtentReportHelpers.SetCurrentTest(ExtentTest);
             Context = await PlaywrightSessionHelpers.CreateContextAsync(Browser);
             Page = await PlaywrightSessionHelpers.CreatePageAsync(Context);
             await PlaywrightSessionHelpers.NavigateToInitialPageAsync(Page);
@@ -36,7 +36,9 @@ namespace PlaywrightWebTemplate.Bases
         {
             var status = TestContext.CurrentContext.Result.Outcome.Status;
             var message = TestContext.CurrentContext.Result.Message;
-            await ExtentReportHelpers.RegistrarResultadoAsync(_test, status, message, Page);
+
+            await ExtentReportHelpers.AttachExecutionVideoAsync(ExtentTest, Page);
+            await ExtentReportHelpers.AddTestResult(ExtentTest, status, message, Page);
 
             await Context.CloseAsync();
         }
